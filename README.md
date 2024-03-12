@@ -4,6 +4,8 @@ This is the first project of the KV Introduction to autonomous vehicles
 ### Project Overview
 This section should contain a brief description of the project and what you are trying to achieve.
 
+
+
 ### Set up
 This section should contain a brief description of the steps to follow to run the code.
 
@@ -23,6 +25,11 @@ In this section, you must explicitly explain your training process and the code 
 
 ### Reference experiment
 This section should detail the results of the reference experiment where you use your selected model in the selected dataset WITHOUT training. It should include training metrics and a detailed explanation of the algorithm's performances.
+
+Metrics:
+- Mean Average Precision (mAP) - is a mean of Precision x Recall curve (AUC) among all target classes in the image dataset, where AP is the area under the precision-recall curve.
+- FPS - Frames per second.
+
 
 ### Improve on the reference
 This section should detail the results of the reference experiment where you use your selected model in the selected dataset AFTER training. It should include training metrics and a detailed explanation of the algorithm's performances.
