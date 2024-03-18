@@ -3,3 +3,4 @@ datasets/
 model/
 converter_result/
 runs/
+.DS_Store
