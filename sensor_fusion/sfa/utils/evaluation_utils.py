@@ -1,14 +1,3 @@
-"""
-# -*- coding: utf-8 -*-
------------------------------------------------------------------------------------
-# Author: Nguyen Mau Dung
-# DoC: 2020.08.17
-# email: nguyenmaudung93.kstn@gmail.com
------------------------------------------------------------------------------------
-# Description: The utils for evaluation
-# Refer from: https://github.com/xingyizhou/CenterNet
-"""
-
 from __future__ import division
 import os
 import sys
@@ -109,9 +98,6 @@ def decode(hm_cen, cen_offset, direction, z_coor, dim, K=40):
     clses = clses.view(batch_size, K, 1).float()
     scores = scores.view(batch_size, K, 1)
 
-    # (scores x 1, ys x 1, xs x 1, z_coor x 1, dim x 3, direction x 2, clses x 1)
-    # (scores-0:1, ys-1:2, xs-2:3, z_coor-3:4, dim-4:7, direction-7:9, clses-9:10)
-    # detections: [batch_size, K, 10]
     detections = torch.cat([scores, xs, ys, z_coor, dim, direction, clses], dim=2)
 
     return detections
@@ -128,7 +114,6 @@ def post_processing(detections, num_classes=3, down_ratio=4, peak_thresh=0.2):
     # (scores-0:1, xs-1:2, ys-2:3, z_coor-3:4, dim-4:7, direction-7:9, clses-9:10)
     :return:
     """
-    # TODO: Need to consider rescale to the original scale: x, y
 
     ret = []
     for i in range(detections.shape[0]):
@@ -160,24 +145,11 @@ def get_labels(detections, num_classes=3):
         for j in range(num_classes):
             if len(frame[j]) > 0:
                 for det in frame[j]:
-                    # (scores-0:1, x-1:2, y-2:3, z-3:4, dim-4:7, yaw-7:8)
                     _score, _x, _y, _z, _h, _w, _l, _yaw = det
                     label_corners = get_corners(_x, _y, _w , _l, _yaw)
                     all_labels.append(label_corners)
     return all_labels
-'''
-def get_labels(detections, num_classes=3):
-    labels = []
-    for j in range(num_classes):
-        if len(detections[j]) > 0:
-            for det in detections[j]:
-                # (scores-0:1, x-1:2, y-2:3, z-3:4, dim-4:7, yaw-7:8)
-                _score, _x, _y, _z, _h, _w, _l, _yaw = det
-                label_corners = get_corners(_x, _y, _w , _l, _yaw)
-                labels.append((label_corners,j))
 
-    return labels
-'''
 
 def draw_predictions(img, detections, num_classes=3):
     for j in range(num_classes):
@@ -211,46 +183,38 @@ def convert_det_to_real_values(detections, num_classes=3):
 
 def measure_detection_performance(preds, labels, min_iou=0.5):
     
-    # find best detection for each valid label
+
     ious = []
     for label in labels:
         matches_lab_pred = []
                 
-        ## step 2 : loop over all detected objects
+
         for pred in preds:
 
-            ## step 5 : compute the intersection over union (IOU) between label and detection bounding-box
             label_poly = Polygon(label)
             pred_poly = Polygon(pred)
             iou = label_poly.intersection(pred_poly).area / label_poly.union(pred_poly).area
 
-            ## step 6 : if IOU exceeds min_iou threshold, store [iou, dist_x, dist_y, dist_z] in matches_lab_det and increase the TP count
             if iou > min_iou:
                 matches_lab_pred.append(iou)
   
         
         # find best match and compute metrics
         if len(matches_lab_pred)>0:
-            best_match = max(matches_lab_pred) # retrieve entry with max iou in case of multiple candidates   
+            best_match = max(matches_lab_pred) 
             ious.append(best_match)
 
     
     # compute positives and negatives for precision/recall
-
-    true_positives = len(ious) # no. of correctly detected objects
+    true_positives = len(ious)
     
-    # NOTE: not quite sure what all_positives refer to. TP+FP? Why is it stored separately?
-    ## step 1 : compute the total number of positives present in the scene
     all_positives = len(preds)
 
-    ## step 2 : compute the number of false negatives
-    # NOTE: it is important to use labels_valid.sum() to only count valid labels, not len(labels) or len(valid_labels)
+    # compute the number of false negatives
     false_negatives = len(labels) - true_positives
 
-    ## step 3 : compute the number of false positives
+    ## compute the number of false positives
     false_positives = len(preds) - true_positives
-    
- 
     
     metrics = [all_positives, true_positives, false_negatives, false_positives]
     det_performance = [ious, metrics]

@@ -133,7 +133,4 @@ def show_bev_map(bev_map: np.ndarray) -> None:
     den_image = Image.fromarray(np.dstack((mask,bev_image[:, :, 1],mask)))
     int_image = Image.fromarray(np.dstack((mask,mask,bev_image[:, :, 2])))
 
-    #int_image.show()
-    #den_image.show()
-    #height_image.show()
     Image.fromarray(bev_image).show()

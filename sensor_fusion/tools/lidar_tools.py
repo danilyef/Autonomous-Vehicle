@@ -36,13 +36,10 @@ def pointcloud_to_range_image(pcl:np.ndarray, lidar_config: edict) -> np.ndarray
     elevations[np.isnan(elevations)] = 0
     
     # Step 3:
-    # 3.2: Convert range and angles to pixel coordinates
-    #Rows of the image 
     vs = np.round(((fov_up - elevations) / (fov_up - fov_down)) * (height-1)).astype(np.int32) 
     #Columns index of the image
     us = np.round(((azimuths + np.pi) / (2*np.pi)) * (width - 1)).astype(np.int32)
     
-    # 3.3: 
     # Create image placeholders filled with 0.
     range_image = np.zeros((height, width), dtype=np.float32)
     intensity_image = np.zeros((height, width, pcl.shape[1]-3), dtype=np.float32)
