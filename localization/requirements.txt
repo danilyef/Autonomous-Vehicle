@@ -1,0 +1,11 @@
+easydict
+ipykernel
+numpy
+matplotlib
+open3d==0.17.0
+pillow
+pypcd4
+scipy
+sympy
+imageio
+networkx
